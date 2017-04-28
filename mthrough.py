@@ -3,30 +3,21 @@ from pysnmp.entity.rfc3413.oneliner import cmdgen
 import time
 
 class Py3status:
-
 	snmp_host = '192.168.1.1'
 	snmp_port = 161
 	snmp_community = 'public'
-
 	wan_in =  '.1.3.6.1.2.1.31.1.1.1.6.4'
 	wan_out = '.1.3.6.1.2.1.31.1.1.1.10.4'
-
 	rate = 'bit' #bit
 	acc = 2
 	refresh = 2
-
 	threshold = 50
 
 	def __init__(self):
 		self.drate = 'Mbps'
-
-
-
-	def mt_wan(self):
-
-		b = self._get_bytes()
 		
-
+	def mt_wan(self):
+		b = self._get_bytes()
 		d1_out= b[0]
 		d1_in = b[1]
 		
@@ -44,16 +35,13 @@ class Py3status:
 
 		color = self.py3.COLOR_LOW
 
-		# Datarate
 		if self.rate == 'bit':
 
 			self.drate = 'Mbps'
 			d_out = d_out * 8
 			d_in  =	d_in  * 8
-		
 		else:
 			self.drate = 'MB/s'
-
 
 		if self.threshold < d_in or d_out:
 			color = self.py3.COLOR_HIGH
@@ -62,14 +50,12 @@ class Py3status:
 
 
 	def _get_bytes(self):
-
 		cmdGen = cmdgen.CommandGenerator()
-
 		errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
 		cmdgen.CommunityData(self.snmp_community),
 		cmdgen.UdpTransportTarget((self.snmp_host, self.snmp_port)),
 		self.wan_in, #out
 		self.wan_out #in
 		)
-
+		
 		return [int(x.prettyPrint().split('=')[1].strip()) for x in varBinds]
